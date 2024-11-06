@@ -234,8 +234,13 @@ decode =lambda l: ''.join([itos[i] for i in l])
 
 model = torch.load("model_bigram.pth")
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 import time
-idx = torch.zeros((1,1),dtype=torch.long,device="cuda")
+context_idx = torch.zeros((1,1),dtype=torch.long,device=device)
 while(True):
-    print(decode(model.generate(idx,max_new_tokens=100)[0].tolist()))
-    time.sleep(0.5)
+    output = model.generate(context_idx,max_new_tokens=100)[0].tolist()
+    context_idx = torch.tensor(output[-1],dtype=torch.long,device=device).reshape(1,1)
+    decoded_output = decode(output)
+    print(decoded_output)
+    time.sleep(0.2)
