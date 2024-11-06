@@ -265,9 +265,11 @@ In the early 2010s, it was reported that the film series could be rebooted to mo
     encode = lambda s:[stoi[c] for c in s]
     decode =lambda l: ''.join([itos[i] for i in l])
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-    data = torch.tensor(encode(text),dtype=torch.long,device="cuda")
+
+    data = torch.tensor(encode(text),dtype=torch.long,device=device)
     print(data[:100])
 
     n = int(0.9 * len(data))
@@ -288,16 +290,16 @@ In the early 2010s, it was reported that the film series could be rebooted to mo
     print("Val size: ", len(val_data))
 
     m = BigramLM(vocab_size)
-    m.to("cuda")
+    m.to(device)
 
-    idx = torch.zeros((1,1),dtype=torch.long,device="cuda")
+    idx = torch.zeros((1,1),dtype=torch.long,device=device)
     print(decode(m.generate(idx,max_new_tokens=100)[0].tolist()))
 
     optim = torch.optim.AdamW(m.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.StepLR(optim, step_size=5000, gamma=0.9)
     losses = []
 
-    epochs = 100000
+    epochs = 1000
     for i in range(epochs):
         optim.zero_grad()
 
