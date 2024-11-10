@@ -288,7 +288,7 @@ def main():
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.5, patience=10, min_lr=1e-6)
     losses = []
 
-    epochs = 100000
+    epochs = 1000
     for i in range(epochs):
         optim.zero_grad()
 
