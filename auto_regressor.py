@@ -2,6 +2,7 @@ import torch
 from torchvision import transforms
 import matplotlib.pyplot as plt
 from PIL import Image
+from image_utils import load_images
 import os
 
 # [Include MaskedConv2d and AutoRegressor classes as defined above]
@@ -49,14 +50,6 @@ class AutoRegressor(torch.nn.Module):
         x = self.conv_out(x)
         return x
 
-
-def load_images(path):
-    images = []
-    image_paths = os.listdir(path)
-    for image_path in image_paths:
-        image = Image.open(os.path.join(path, image_path))
-        images.append(image)
-    return images
 
 def prepare_data(images):
     inputs = []

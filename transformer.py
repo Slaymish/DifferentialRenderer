@@ -297,7 +297,7 @@ def main():
 
         loss.backward()
         optim.step()
-        scheduler.step()
+        scheduler.step(loss)
 
         losses.append(loss.item())
         if i % 100 == 0:

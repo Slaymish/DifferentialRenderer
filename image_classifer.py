@@ -1,5 +1,9 @@
 import torch
-import matplotlib.pyplot as plt
+from torchvision import datasets, transforms
+from image_utils import load_images
+import numpy as np
+
+datasets.DatasetFolder
 
 class ImageClasifier(torch.nn.Module):
     def __init__(self, num_classes, conv_layers, fc_layers, dropout_rate=0.5, activation_fn=torch.nn.ReLU):
@@ -45,103 +49,96 @@ class ImageClasifier(torch.nn.Module):
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
 
-# Create a model
-conv_layers = [(6, 5), (16, 5)]  # (out_channels, kernel_size)
-fc_layers = [120, 84]
-model = ImageClasifier(2, conv_layers, fc_layers)  # binary classification
 
-# create param dict (going to grid search), and try each model  
-activation_fns = [torch.nn.ReLU, torch.nn.Sigmoid, torch.nn.Tanh, torch.nn.Softmax]
-dropout_rates = [0.1, 0.3, 0.5, 0.7]
-conv_layers = [[(6, 5), (16, 5)], [(6, 5), (16, 5), (32, 5)], [(6, 5), (16, 5), (32, 5), (64, 5)]]
-fc_layers = [[120, 84]]
 
-def unhash_params(hashed_params):
-    return eval(hashed_params)
 
-def hash_params(params):
-    return str(params)
-
-def grid_search(activation_fns, dropout_rates, conv_layers, fc_layers):
-    results = {}
-    for activation_fn in activation_fns:
-        for dropout_rate in dropout_rates:
-            for conv_layer in conv_layers:
-                for fc_layer in fc_layers:
-                    try:
-                        model = ImageClasifier(2, conv_layer, fc_layer, dropout_rate, activation_fn)
-                        print(f'Training model with activation_fn={activation_fn}, dropout_rate={dropout_rate}, conv_layer={conv_layer}, fc_layer={fc_layer}')
-                        val_losses, test_losses = train_model(model)
-                        results[hash_params((activation_fn, dropout_rate, conv_layer, fc_layer))] = (val_losses, test_losses)
-                    except Exception as e:
-                        print(f'Error training model with activation_fn={activation_fn}, dropout_rate={dropout_rate}, conv_layer={conv_layer}, fc_layer={fc_layer}')
-                        print(e)
-    return results
-
-def train_model(model):
-    # create synthetic data
-    target = torch.tensor([1])
-    x_val = torch.randn(1, 3, 32, 32)
-    x_test = torch.randn(1, 3, 32, 32)
-
-    # test backward pass
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
-
-    val_losses = []
-    test_losses = []
-
+def train_epoch(model, optimizer, criterion, x, target):
     for i in range(100):
         optimizer.zero_grad()
-        y_val = model(x_val)
-        val_loss = criterion(y_val, target)
-        val_loss.backward()
+        output = model(x)
+        loss = criterion(output, target)
+        loss.backward()
         optimizer.step()
-        val_losses.append(val_loss.item())
 
-        y_test = model(x_test)
-        test_loss = criterion(y_test, target)
-        test_losses.append(test_loss.item())
+def train_model(model, strawberries_loader, tomatoes_loader,epochs=10):
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-        if i % 100 == 0:
-            print(f'Iteration {i}, Validation Loss: {val_loss.item()}, Test Loss: {test_loss.item()}')
+    for epoch in range(epochs):
+        for i, data in enumerate(strawberries_loader):
+            x, target = data
+            train_epoch(model, optimizer, criterion, x, target)
+
+        val_losses = []
+        for i, data in enumerate(tomatoes_loader):
+            x, target = data
+            output = model(x)
+            loss = criterion(output, target)
+            val_losses.append(loss.item())
+
+        test_losses = []
+        for i, data in enumerate(strawberries_loader):
+            x, target = data
+            output = model(x)
+            loss = criterion(output, target)
+            test_losses.append(loss.item())
 
     return val_losses, test_losses
 
-texts = ['Hello, World!', 'This is a test.', 'Another test.', 'This is a very long text that will raise an error.']
 
-from encode_text import encode_text_to_image, decode_image_to_text
+class ImageDataSet(datasets):
+    def __init__(self,s_images,t_images,train_size=0.8):
+        self.transformers = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor()
+        ])
 
-images = []
-image_dim = max(len(text) for text in texts)
-for text in texts:
-    try:
-        image = encode_text_to_image(text, image_dim)
-        images.append(image)
-    except ValueError as e:
-        print(f'Error: {e}')
+        # lists of ImageFile
+        self.images = np.stack(s_images,t_images)
+
+    def set_transforms(self,transformers):
+        self.transformers = transformers
 
 
-# create model using image_dim
-model = ImageClasifier(2, [(6, 5), (16, 5)], [120, 84])
+    def get_idx(self,idx):
+        return self.transformers(self.images[idx])
 
-# test forward pass
-for image in images:
-    image = image.unsqueeze(0).unsqueeze(0).repeat(1, 3, 1, 1)
-    output = model(image)
-    print(output)
 
-# test backward pass
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-target = torch.tensor([1])
-for i in range(100):
-    optimizer.zero_grad()
-    for image in images:
-        image = image.unsqueeze(0).unsqueeze(0).repeat(1, 3, 1, 1)
-        output = model(image)
-        loss = criterion(output, target)
-        loss.backward()
-    optimizer.step()
-    print(f'Iteration {i}, Loss: {loss.item()}')
+
+def main():
+    # Create a model
+    conv_layers = [(6, 5), (16, 5)]  # (out_channels, kernel_size)
+    fc_layers = [120, 84]
+    model = ImageClasifier(2, conv_layers, fc_layers)  # binary classification
+
+    strawberries = "strawberry_images"
+    tomatoes = "tomato_images"
+
+    s_images = load_images(strawberries)
+    t_images = load_images(tomatoes)
+
+    train_size = 0.8
+
+    # combine s and t
+
+
+    strawberries_dataset = datasets.ImageFolder(strawberries, transform=transforms.ToTensor())
+    tomatoes_dataset = datasets.ImageFolder(tomatoes, transform=transforms.ToTensor())
+
+    strawberries_loader = torch.utils.data.DataLoader(strawberries_dataset, batch_size=4, shuffle=True)
+    tomatoes_loader = torch.utils.data.DataLoader(tomatoes_dataset, batch_size=4, shuffle=True)
+
+    val_losses, test_losses = train_model(model, strawberries_loader, tomatoes_loader)
+
+    print(val_losses)
+
+    if strawberries:
+        print(strawberries)
+    else:
+        print("dont")
+    print(test_losses)
+
+
+if __name__ == "__main__":
+    main()
