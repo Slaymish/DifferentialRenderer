@@ -4,6 +4,8 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
 import os
+from utils.image_utils import ImageDataset
+import utils.constants as constants
 
 class DiffusionModel(torch.nn.Module):
     def __init__(self):
@@ -27,25 +29,11 @@ class DiffusionModel(torch.nn.Module):
         x = self.decoder(x)
         return x
 
-class ImageDataset(Dataset):
-    def __init__(self, image_dir, transform=None):
-        self.image_dir = image_dir
-        self.image_paths = os.listdir(image_dir)
-        self.transform = transform or transforms.ToTensor()
-    
-    def __len__(self):
-        return len(self.image_paths)
-    
-    def __getitem__(self, idx):
-        img_path = os.path.join(self.image_dir, self.image_paths[idx])
-        image = Image.open(img_path).convert('L')
-        if self.transform:
-            image = self.transform(image)
-        return image
 
-def train(model, dataloader, timesteps, betas, optimizer, criterion, device):
+
+def train(model, dataloader, timesteps, betas, optimizer, criterion, device, epochs=10):
     model.train()
-    for epoch in range(10):  # Set number of epochs
+    for epoch in range(epochs):
         for x in dataloader:
             x = x.to(device)
             optimizer.zero_grad()
@@ -58,25 +46,10 @@ def train(model, dataloader, timesteps, betas, optimizer, criterion, device):
             optimizer.step()
             print("Loss: ", loss.item())
 
-def sample(model, timesteps, betas, device):
-    model.eval()
-    with torch.no_grad():
-        # Initialize with random noise
-        x = torch.randn(1, 1, 256, 256, device=device)
-        alphas = 1.0 - betas
-        alphas_cumprod = torch.cumprod(alphas, dim=0)
-        sqrt_recip_alphas = torch.sqrt(1.0 / alphas)
-        sqrt_one_minus_alphas_cumprod = torch.sqrt(1.0 - alphas_cumprod)
-        
-        for t in reversed(range(timesteps)):
-            t_tensor = torch.tensor([t], device=device)
-            eps_theta = model(x, t_tensor)
-            if t > 0:
-                noise = torch.randn_like(x)
-            else:
-                noise = torch.zeros_like(x)
-            x = sqrt_recip_alphas[t] * (x - (betas[t] / sqrt_one_minus_alphas_cumprod[t]) * eps_theta) + noise * torch.sqrt(betas[t])
-        return x
+    # Save the model
+    torch.save(model.state_dict(), os.path.join(constants.MODEL_SAVE_DIR, "diffusion_model.pth"))
+
+
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -102,15 +75,9 @@ def main():
     betas = torch.linspace(0.0001, 0.02, timesteps).to(device)
     
     # Train the model
-    train(model, dataloader, timesteps, betas, optimizer, criterion, device)
+    train(model, dataloader, timesteps, betas, optimizer, criterion, device, epochs=10)
     
-    # Generate a new image with the trained model
-    generated_image = sample(model, timesteps, betas, device)
-    # Convert tensor to image and save
-    transforms.ToPILImage()(generated_image.squeeze().cpu()).save('generated_image_diffusion.png')
-    print("Generated image saved as generated_image.png")
-
-    print("Success")
+    
 
 if __name__ == "__main__":
     main()

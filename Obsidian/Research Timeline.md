@@ -73,8 +73,6 @@
 
 ### **Break Period (23rd December–5th January): Optional Work or Rest**
 
-- Use this time to consolidate notes, refine experimental setups, or take a well-deserved break.
-
 ### **Weeks 7–8 (6th–19th January): Data Analysis**
 
 - **Duration**: 2 weeks
