@@ -1,6 +1,6 @@
 import torch
 from torchvision import datasets, transforms
-from image_utils import load_images
+from code.image_utils import load_images
 import numpy as np
 
 datasets.DatasetFolder

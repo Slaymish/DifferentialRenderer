@@ -2,7 +2,7 @@ import torch
 from torchvision import transforms
 import matplotlib.pyplot as plt
 from PIL import Image
-from image_utils import load_images
+from code.image_utils import load_images
 import os
 
 # [Include MaskedConv2d and AutoRegressor classes as defined above]
