@@ -1,8 +1,9 @@
 import torch
 from torchvision import transforms
 import matplotlib.pyplot as plt
-from utils.image_utils import load_images
+from .utils.image_utils import load_images
 import utils.constants as constants
+import utils.train_utils as train_utils
 
 class MaskedConv2d(torch.nn.Conv2d):
     def __init__(self, mask_type, *args, **kwargs):
@@ -52,7 +53,7 @@ class AutoRegressor(torch.nn.Module):
 def prepare_data(images):
     inputs = []
     targets = []
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = constants.DEVICE
     for image in images:
         image = image.to(device)
         # No need to shift images since masking handles dependencies
@@ -62,7 +63,7 @@ def prepare_data(images):
 
 def main():
     model = AutoRegressor()
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = constants.DEVICE
     model.to(device)
 
     # Load and preprocess images
@@ -85,40 +86,19 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     criterion = torch.nn.MSELoss()
 
-    losses = []
-    epochs = 10000
+    epochs = 1000
 
-    for epoch in range(epochs):
-        epoch_loss = 0
-        for input_image, target_image in zip(inputs, targets):
-            input_image = input_image.unsqueeze(0).to(device)
-            target_image = target_image.unsqueeze(0).to(device)
-
-            # Forward pass
-            output = model(input_image)
-
-            # Compute loss
-            loss = criterion(output, target_image)
-
-            # Backpropagation
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            epoch_loss += loss.item()
-        avg_loss = epoch_loss / len(inputs)
-        losses.append(avg_loss)
-        print(f"Epoch {epoch+1}/{epochs}, Loss: {avg_loss}")
+    # Train the model
+    train_losses, _ = train_utils.train_model(model, list(zip(inputs, targets)), epochs, optimizer, criterion, device)
 
     # Save the model
     torch.save(model.state_dict(), constants.MODEL_SAVE_DIR + "/auto_regressor.pth")
 
     # Plot losses
-    plt.plot(losses)
+    plt.plot(train_losses)
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("Loss over epochs")
-    plt.savefig("loss.png")
+    plt.title("Training Loss")
     plt.show()
 
     
