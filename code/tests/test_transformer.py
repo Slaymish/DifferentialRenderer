@@ -1,5 +1,5 @@
 import torch
-from transformer import BigramLM, text_to_train
+from models.transformer import BigramLM, text_to_train
 
 text = text_to_train
 text = text.replace('\n','')
