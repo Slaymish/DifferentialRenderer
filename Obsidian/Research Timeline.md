@@ -119,6 +119,5 @@
   - Proofread and format the paper according to the target publication’s guidelines.
   - **Meeting 8 (Mid-week)**: Final review with your supervisor before submission.
 - **Deliverables**:
-  - Finalized research paper ready for submission.
-
+  - Finalised research paper ready for submission.
 
