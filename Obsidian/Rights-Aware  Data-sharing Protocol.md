@@ -2,7 +2,7 @@
 
 - Cryptographically enforced
 - Protocol designed to embed legally binding, user-defined rights into the data itself, ensuring compliance even after the data is shared or downloaded
-- **They can't access the things they want to recieve/establish a connection, without agreeing to the same terms**
+- **They can't access the things they want to receive/establish a connection, without agreeing to the same terms**
 
 ## Components
 
@@ -68,7 +68,7 @@
 - $SDec(m,k)$ - Symmetrically Decrypt a message ($m$), with key ($k$)
 - $AEnc(m,k)$ - Asymmetrically Encrypt a message ($m$), with key ($k$)
 - $ADec(m,k)$ - Asymmetrically Decrypt a message ($m$), with key ($k$)
-- $t$ - Terms bob and alice wish to agree to
+- $t$ - Terms bob and Alice wish to agree to
 
 **Scenario: Alice sending image $m$ to Bob**
 
