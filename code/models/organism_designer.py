@@ -1,6 +1,8 @@
 import pygame
 import torch
 import random
+import utils.constants as constants
+import os
 
 
 
@@ -78,7 +80,7 @@ class OrganismModel:
         self.position += self.velocity
 
 class OrganismDesigner:
-    def __init__(self):
+    def __init__(self,device):
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption('Organism Designer')
         button_top = 600 - 50
@@ -106,6 +108,8 @@ class OrganismDesigner:
         self.goal_position = self.screen.get_width() - 100
 
         self.model = OrganismModel(self.gravity)  # Pass gravity to OrganismModel
+
+        self.model.to(device)
 
         pygame.font.init()
         self.font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -138,13 +142,13 @@ class OrganismDesigner:
     def save_model(self):
         print('Save')
         path = 'organism_model.pth'
-        self.model.save(path)
+        self.model.save(os.path.join(constants.MODEL_DIR, path))
         print(f'Model saved to {path}.')
 
     def load_model(self):
         print('Load')
         path = 'organism_model.pth'
-        self.model.load(path)
+        self.model.load(os.path.join(constants.MODEL_DIR, path))
         print(f'Model loaded from {path}.')
 
     def step(self):
@@ -223,5 +227,5 @@ class OrganismDesigner:
     
 
 if __name__ == '__main__':
-    designer = OrganismDesigner()
+    designer = OrganismDesigner(constants.DEVICE)
     designer.run_gui()
