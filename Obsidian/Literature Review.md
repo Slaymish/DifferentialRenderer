@@ -17,16 +17,53 @@
 ## Papers to read
 
 - [ ] Privacy and Security Issues in Deep Learning: A Survey
-- [ ] Data poisoning attacks against machine learning algorithms
+	- Model extraction attack: Attacker aims to duplicate the params/hyperparams of a deployed model to provide cloud based ML services
+	- Model inversion attack: Infer sensitive info from model
+	- two attacks in DL: adversarial attacks and poisoning attacks
+	- adversarial attacks can make a NN classifier wrongly predict with high confidence
+		- In blackbox attacks, the adversarial example is made by sending a series of queries to the model
+	- mitigations
+		- homomorphic encryption and secure multi-party computation: aim to preserve the privacy of the training and testing data
+		- "there still is no defence method that can completely defend against adversarial examples."
+		- Poisoning prevention:
+			- Outlier detection (may limit the affect of attacks like distance based label flipping)
+			- To improve robustness of the model, to resist pollution of samples
+	- They provided a useful model to show where in the lifecycle of DL different attacks/defences are used: ![[attacks_defenses_in_DL.png]]
+	- Adversarial example techniques:
+		-  One pixel attack: 
+- [x] Data poisoning attacks against machine learning algorithms
 	- Only focuses on binary classification (with multiple different models)
 	- Two attacks are **random label flipping** and **distance-based label flipping**
 		- distance being distance of instance to the decision boundary (furthest first)
+	- Knn base accuracy was 90%, with 50% flipped data, accuracy dropped to 45.83% (for dblf) and 54.16% (for rlf) - for Instagram spamming dataset
+	- No change in accuracy with rlf with poisoned data 0-12.5% for SVM,SGD,LR,Knn
+	- dblf decreased all accuracies progressively
+	- DBLF generally results in a more successful attack than RLB
+		- As selected data for label flipping attacks should be easily distinguishable by the decision boundary of the model (further away)
+	- For malware:
+		- at 0% poisoned, AUC=0.99
+		- at 25%, AUC=0.53
+		- At 50%, AUC = 0.01
+	- overall, "the distance-based attack is more effective on the machine learning algorithms than the random label flipping attack in the first two stages of attacks, where 12.5% and 25% of data were poisoned"
+	- "In our test cases, **KNN and RF algorithms had better robustness and performance results** among other machine learning algorithms when we considered the overall performances of each algorithm"
 - [x] Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models
 	- Testing on SDXL
-	- As SDXL and other opensource model use publicly sourced data, it makes them vulnerable to 
+	- As SDXL and other opensource model use publicly sourced data, it makes them vulnerable to data poisoning attacks
 - [ ] Beyond data poisoning in federated learning
 - [ ] Dataset Security for Machine Learning: Data Poisoning, Backdoor Attacks, and Defences
 - [ ] Machine Learning Security Against Data Poisoning: Are We There Yet?
+- [ ] One Pixel Attack for Fooling Deep Neural Networks
+	- Can be formalised as an optimisation problem with constraints
+	- $e(X)*=$ maximise $f_{adv}(X+e(X))$ subject to $||e(X)|| <= L$
+		- $e(X)*$ is the optimised solution
+		- $adv$ is the target class
+		- $X$ is the original, unaltered image (a vector, where each element is a pixel)
+		- $L$ is the maximum modification allowed
+		- $f_{t}(X)$ is the probability of $X$ belonging to the class $t$
+	- In the one-pixel attack, they set $L=1$
+		- In their approach only $L$ dimensions are modified, all other dimensions of $e(X)$ are left as $0$
+	- Previous work allowed modification to all dimensions, while limiting strength, while they limit to $L$ dimensions, and do **not** limit strength
+
 
 
 
@@ -40,11 +77,13 @@
 
 ## Terminology
 
-- **Poisoning Attacks**: "manipulate training data to introduce unexpected behaviour to the model at training time" - Nightshade paper
+- **Data Poisoning Attacks**: "manipulate training data to introduce unexpected behaviour to the model at training time" - Nightshade paper
+	- **Backdoor Attacks**: inject a hidden trigger, causing inputs containing the trigger to be misclassified during inference. So the model has a target output for a specific mark.
+	- **Accuracy Drop Attack**: Aiming to reduce the performance of the target model at the testing stage
+	- **Target Misclassification Attack:** Aims to get test samples to be misclassified at testing stage
+
 - **Concept Sparsity**: "the number of training samples associated with a specific concept or prompt is quite low, on the order of thousands." - Nightshade paper
-- **Data poisoning attacks**:  "inject poison data into training pipelines to degrade performance of the trained model." - Nightshade paper
-- **misclassification attacks**: identify one class as another
-- **backdoor attacks**: inject a hidden trigger, causing inputs containing the trigger to be misclassified during inference.
+
 - ***clean-label* backdoor attacks**: where attackers do not control the labels assigned to their poison data samples
 
 
@@ -62,6 +101,7 @@
 
 # Unsorted notes from papers
 
+- Using Zotero to store/annotate papers
 
 ## Nightshade
 
