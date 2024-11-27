@@ -13,24 +13,57 @@
 
 
 
-- First it'd be a good idea for be to cover and understand the core concepts related to this project
-- I'm going to look into poisoning, data poisoning in ai models, backdoors etc
 
-## Fundamental Terms
+## Papers to read
 
-### Data poisoning
+- [ ] Privacy and Security Issues in Deep Learning: A Survey
+- [ ] Data poisoning attacks against machine learning algorithms
+	- Only focuses on binary classification (with multiple different models)
+	- Two attacks are **random label flipping** and **distance-based label flipping**
+		- distance being distance of instance to the decision boundary (furthest first)
+- [x] Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models
+	- Testing on SDXL
+	- As SDXL and other opensource model use publicly sourced data, it makes them vulnerable to 
+- [ ] Beyond data poisoning in federated learning
+- [ ] Dataset Security for Machine Learning: Data Poisoning, Backdoor Attacks, and Defences
+- [ ] Machine Learning Security Against Data Poisoning: Are We There Yet?
 
-```
-@misc{shan2024nightshadepromptspecificpoisoningattacks,
-      title={Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models}, 
-      author={Shawn Shan and Wenxin Ding and Josephine Passananti and Stanley Wu and Haitao Zheng and Ben Y. Zhao},
-      year={2024},
-      eprint={2310.13828},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2310.13828}, 
-}
-```
+
+
+
+## Questions
+
+- Does the uni have a IEEE dataport subscription?
+	- To use this dataset (https://ieee-dataport.org/documents/dataset-malwarebeningn-permissions-android) used in this paper (https://linkinghub.elsevier.com/retrieve/pii/S0957417422012933)
+- Are the datasets suitable for testing poisoning or backdoor scenarios?
+- Are there better alternatives for malware classification or intrusion detection?
+
+## Terminology
+
+- **Poisoning Attacks**: "manipulate training data to introduce unexpected behaviour to the model at training time" - Nightshade paper
+- **Concept Sparsity**: "the number of training samples associated with a specific concept or prompt is quite low, on the order of thousands." - Nightshade paper
+- **Data poisoning attacks**:  "inject poison data into training pipelines to degrade performance of the trained model." - Nightshade paper
+- **misclassification attacks**: identify one class as another
+- **backdoor attacks**: inject a hidden trigger, causing inputs containing the trigger to be misclassified during inference.
+- ***clean-label* backdoor attacks**: where attackers do not control the labels assigned to their poison data samples
+
+
+## Datasets
+
+- **Android permissions Malware** - https://ieee-dataport.org/documents/dataset-malwarebeningn-permissions-android
+	- Columns are android perms, rows are applications
+- **Malware Detection in Network Traffic Data** - https://www.kaggle.com/datasets/agungpambudi/network-malware-detection-connection-analysis
+	- Columns are ip/port/connection type etc, rows are network connections
+
+
+
+
+***
+
+# Unsorted notes from papers
+
+
+## Nightshade
 
 **Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models**
 
@@ -43,8 +76,6 @@
 
 - introduction:
 	- public consensus considers these diffusion models (the big current ones) impervious to data poisoning attacks
-	- **[[Poisoning Attacks]]: "manipulate training data to introduce unexpected behavior to the model at training time"**
-	- **[[Concept Sparsity]]: "the number of training samples associated with a specific concept or prompt is quite low, on the order of thousands."**
 		- suggests viability of prompt-specific poisoning attacks
 	- four benifits to nightshades optimisations:
 		- 1) Nightshade poison samples are benign images shifted in the feature space, and still look like their benign counterparts to the human eye. They avoid detection through human inspection and prompt generation
@@ -61,7 +92,7 @@
 		- Uses generative adversarial networks (GAN), variational autoencoders (VAE), diffusion models.
 		- All SOTA now uses *latent diffusion* which is first translating the image into a lower dimensional feature space (with VAE) and doing the diffusion process there.
 		- training data:
-			- subject to minimal moderation - uses automated alignment model [29]
+			- subject to **minimal moderation** - uses automated alignment model [29]
 			- creates the possibility of [[Poisoning Attacks]] [30]
 		- model training
 			- from scratch is expensive (600k USD for SD 1)
@@ -69,12 +100,6 @@
 				- People can do it for a specific use case
 				- Platforms offer continuous-training as a service [25,36,37]
 	- 2.2 Data poisoning attacks
-		- **Data poisoning attacks:  "inject poison data into training pipelines to degrade performance of the trained model."**
-		- against classifiers
-			- well studied [38]
-			- misclassification attacks: identify one class as another
-			- backdoor attacks: inject a hidden trigger, causing inputs containing the trigger to be misclassified during inference.
-			- *clean-label* backdoor attacks: where attackers do not control the labels assigned to their poison data samples [43,44,45] (interesting)
 		- Poisoning Attacks against Diffusion Models.
 			- some propose backdoor poisoning attacks that inject attacker defined triggers into text prompts to generate specific images [11, 12, 13]
-			- 
+
