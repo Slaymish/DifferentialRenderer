@@ -290,7 +290,7 @@ class ProofDataset(Dataset):
 
 # 6. Define the Transformer Model
 class TransformerModel(nn.Module):
-    def __init__(self, vocab_size, embedding_dim, num_heads, num_layers, dim_feedforward, dropout=0.1):
+    def __init__(self, vocab_size, embedding_dim, num_heads, num_layers, dim_feedforward, dropout=0.3):
         super(TransformerModel, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=symbol_to_id['<PAD>'])
         self.pos_encoder = PositionalEncoding(embedding_dim, dropout)
@@ -343,8 +343,8 @@ class PositionalEncoding(nn.Module):
 # 7. Training Loop with Early Stopping and Learning Rate Scheduler
 def train_model(model, train_loader, epochs=50, patience=5):
     criterion = nn.CrossEntropyLoss(ignore_index=symbol_to_id['<PAD>'])
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=2, factor=0.5, verbose=True)
+    optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=1e-5)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=1, factor=0.5, verbose=True)
     best_loss = float('inf')
     patience_counter = 0
 
@@ -407,22 +407,29 @@ def evaluate_model(model, test_loader):
         for batch_inputs_padded, batch_targets_padded in test_loader:
             batch_inputs_padded = batch_inputs_padded.to(model.device)
             batch_targets_padded = batch_targets_padded.to(model.device)
-            src_key_padding_mask = (batch_inputs_padded == symbol_to_id['<PAD>'])
 
             for inp, tgt in zip(batch_inputs_padded, batch_targets_padded):
                 predicted_symbols = predict_next_step(model, inp)
                 target_symbols = decode_ids(tgt.tolist())
+                # Exclude special tokens
                 target_symbols = [sym for sym in target_symbols if sym not in special_tokens]
+                predicted_symbols = [sym for sym in predicted_symbols if sym not in special_tokens]
 
                 if predicted_symbols == target_symbols:
                     correct += 1
+                else:
+                    # Optional: Print incorrect predictions for analysis
+                    print(f"Input: {decode_ids(inp.tolist())}")
+                    print(f"Target: {target_symbols}")
+                    print(f"Predicted: {predicted_symbols}\n")
                 total += 1
 
     accuracy = correct / total * 100
     print(f"Evaluation Accuracy: {accuracy:.2f}%")
 
+
 # 9. Prediction Function with Beam Search
-def predict_next_step(model, input_sequence, max_length=10, beam_width=3):
+def predict_next_step(model, input_sequence, max_length=10, beam_width=5):
     """
     Predict the next step using beam search.
     """
@@ -478,7 +485,9 @@ def predict_next_step(model, input_sequence, max_length=10, beam_width=3):
 # Main execution
 if __name__ == '__main__':
     # Generate synthetic proofs
-    synthetic_proofs = generate_synthetic_proofs(num_proofs=5000)
+    synthetic_proofs = generate_synthetic_proofs(num_proofs=20000)
+
+    random.shuffle(synthetic_proofs)
 
     # Split the proofs into training and testing sets
     split_index = int(len(synthetic_proofs) * 0.8)
@@ -501,10 +510,10 @@ if __name__ == '__main__':
 
     # Define model parameters
     vocab_size = len(symbols)
-    embedding_dim = 128
+    embedding_dim = 256
     num_heads = 8
-    num_layers = 4
-    dim_feedforward = 512
+    num_layers = 6
+    dim_feedforward = 1024
 
     # Initialize the model
     model = TransformerModel(
@@ -521,7 +530,7 @@ if __name__ == '__main__':
     model.to(device)
 
     # Train the model
-    train_model(model, train_loader, epochs=50, patience=5)
+    train_model(model, train_loader, epochs=100, patience=5)
 
     # Load the best model
     model.load_state_dict(torch.load('best_model.pth'))
