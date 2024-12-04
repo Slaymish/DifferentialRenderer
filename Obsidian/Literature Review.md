@@ -16,7 +16,7 @@
 
 ## Papers to read
 
-- [ ] Privacy and Security Issues in Deep Learning: A Survey
+- [x] Privacy and Security Issues in Deep Learning: A Survey - https://ieeexplore.ieee.org/document/9294026?arnumber=9294026
 	- Model extraction attack: Attacker aims to duplicate the params/hyperparams of a deployed model to provide cloud based ML services
 	- Model inversion attack: Infer sensitive info from model
 	- two attacks in DL: adversarial attacks and poisoning attacks
@@ -31,7 +31,7 @@
 	- They provided a useful model to show where in the lifecycle of DL different attacks/defences are used: ![[attacks_defenses_in_DL.png]]
 	- Adversarial example techniques:
 		-  One pixel attack: 
-- [x] Data poisoning attacks against machine learning algorithms
+- [x] Data poisoning attacks against machine learning algorithms - https://www.sciencedirect.com/science/article/abs/pii/S0957417422012933?via%3Dihub
 	- Only focuses on binary classification (with multiple different models)
 	- Two attacks are **random label flipping** and **distance-based label flipping**
 		- distance being distance of instance to the decision boundary (furthest first)
@@ -46,13 +46,13 @@
 		- At 50%, AUC = 0.01
 	- overall, "the distance-based attack is more effective on the machine learning algorithms than the random label flipping attack in the first two stages of attacks, where 12.5% and 25% of data were poisoned"
 	- "In our test cases, **KNN and RF algorithms had better robustness and performance results** among other machine learning algorithms when we considered the overall performances of each algorithm"
-- [x] Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models
+- [x] Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models - https://arxiv.org/abs/2310.13828
 	- Testing on SDXL
-	- As SDXL and other opensource model use publicly sourced data, it makes them vulnerable to data poisoning attacks
-- [ ] Beyond data poisoning in federated learning
-- [ ] Dataset Security for Machine Learning: Data Poisoning, Backdoor Attacks, and Defences
-- [ ] Machine Learning Security Against Data Poisoning: Are We There Yet?
-- [ ] One Pixel Attack for Fooling Deep Neural Networks
+	- As SDXL and other opensource model use publicly sourced data, it makes them vulnerable to data poisoning attacks 
+- [ ] Beyond data poisoning in federated learning - https://www.sciencedirect.com/science/article/abs/pii/S0957417423016949?via%3Dihub
+- [ ] Dataset Security for Machine Learning: Data Poisoning, Backdoor Attacks, and Defences - https://ieeexplore.ieee.org/document/9743317?arnumber=9743317 
+- [ ] Machine Learning Security Against Data Poisoning: Are We There Yet? - https://ieeexplore.ieee.org/document/10461694?arnumber=10461694
+- [x] One Pixel Attack for Fooling Deep Neural Networks - https://ieeexplore.ieee.org/document/8601309?arnumber=8601309
 	- Can be formalised as an optimisation problem with constraints
 	- $e(X)*=$ maximise $f_{adv}(X+e(X))$ subject to $||e(X)|| <= L$
 		- $e(X)*$ is the optimised solution
@@ -63,6 +63,7 @@
 	- In the one-pixel attack, they set $L=1$
 		- In their approach only $L$ dimensions are modified, all other dimensions of $e(X)$ are left as $0$
 	- Previous work allowed modification to all dimensions, while limiting strength, while they limit to $L$ dimensions, and do **not** limit strength
+	- To create an **Adversarial Example**
 
 
 
@@ -74,6 +75,11 @@
 	- To use this dataset (https://ieee-dataport.org/documents/dataset-malwarebeningn-permissions-android) used in this paper (https://linkinghub.elsevier.com/retrieve/pii/S0957417422012933)
 - Are the datasets suitable for testing poisoning or backdoor scenarios?
 - Are there better alternatives for malware classification or intrusion detection?
+- Static or dynamic malware classification?
+- If static, what features is the model trained on? 
+	- Opcodes?
+	- Frequency of certain codes?
+	- Imports?
 
 ## Terminology
 
@@ -86,6 +92,8 @@
 
 - ***clean-label* backdoor attacks**: where attackers do not control the labels assigned to their poison data samples
 
+- **benign-tuning**: backdoor removal through clean fine-tuning
+- **poison-tuning**: backdoor injection through fine-tuning
 
 ## Datasets
 
