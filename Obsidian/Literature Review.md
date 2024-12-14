@@ -11,6 +11,7 @@
 - Identify **critical AI applications in cybersecurity** and investigate the potential vulnerabilities in these systems to model poisoning attacks.
   - Assess the stealth, effectiveness, and impact of such attacks in real-world scenarios.
 - Explore and critique **existing defences against backdoor attacks in AI models**.
+- 
 
 ## Papers to read
 
@@ -64,6 +65,7 @@
   - To create an **Adversarial Example**
 - [ ] EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models - https://arxiv.org/abs/1804.04637
 - [x] Batman
+- [ ] 
 
 ## Questions
 
@@ -92,23 +94,7 @@
 - **benign-tuning**: backdoor removal through clean fine-tuning
 - **poison-tuning**: backdoor injection through fine-tuning
 
-## Datasets
 
-**Dynamic**:
-
-- **Android permissions Malware** - https://ieee-dataport.org/documents/dataset-malwarebeningn-permissions-android
-  - Columns are android perms, rows are applications
-- **Malware Detection in Network Traffic Data** - https://www.kaggle.com/datasets/agungpambudi/network-malware-detection-connection-analysis
-  - Columns are ip/port/connection type etc, rows are network connections
-- The CTU-13 Dataset. A Labeled Dataset with Botnet, Normal and Background traffic. - https://www.stratosphereips.org/datasets-ctu13
-
-**Static:**
-
-- Microsoft Malware Classification Challenge (BIG 2015) - https://www.kaggle.com/c/malware-classification/data?select=trainLabels.csv
-- **Elastic Malware Benchmark for Empowering Researchers** - https://github.com/elastic/ember
-  - A large-scale, labeled dataset of extracted malware features (e.g., static analysis features like PE headers, byte histograms).
-  - https://arxiv.org/pdf/1804.04637 - EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models
-- theZoo - A Live Malware Repository - https://thezoo.morirt.com
 
 ## Tools
 
