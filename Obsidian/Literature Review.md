@@ -63,6 +63,7 @@
   - Previous work allowed modification to all dimensions, while limiting strength, while they limit to $L$ dimensions, and do **not** limit strength
   - To create an **Adversarial Example**
 - [ ] EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models - https://arxiv.org/abs/1804.04637
+- [x] Batman
 
 ## Questions
 
